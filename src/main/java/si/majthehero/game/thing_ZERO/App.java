@@ -26,10 +26,7 @@ public class App implements Runnable {
 
     private long window;
 
-    private Tetrahedron tetrahedron;
-    private TerrainBlock terrainBlock;
-    private Camera camera;
-
+    private Game game;
 
     private void start() {
         running = true;
@@ -61,6 +58,7 @@ public class App implements Runnable {
 
         glClearColor(0.5f, 0.6f, 1.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+
         glActiveTexture(GL_TEXTURE1);
 
         Shader.loadAll();
@@ -70,10 +68,8 @@ public class App implements Runnable {
         Shader.TERRAIN_SHADER.setUniform1i("tex", 1);
         Shader.TERRAIN_SHADER.disable();
 
-        terrainBlock = new TerrainBlock(
-            new float[TerrainBlock.resolution][TerrainBlock.resolution],
-            0, 0);
-        camera = new Camera();
+        game = new Game();
+
     }
 
     @Override
@@ -96,53 +92,13 @@ public class App implements Runnable {
     }
 
     private void update(double dT) {
-        glfwPollEvents();
-        camera.setDeltaTime(dT);
-        if (Input.keys[GLFW_KEY_W]) {
-            camera.move(1,0,0);
-//            System.out.println("W");
-        }
-        if (Input.keys[GLFW_KEY_S]) {
-            camera.move(-1,0,0);
-        }
-        if (Input.keys[GLFW_KEY_A]) {
-            camera.move(0,1,0);
-        }
-        if (Input.keys[GLFW_KEY_D]) {
-            camera.move(0,-1,0);
-        }
-
-        if (Input.keys[GLFW_KEY_Q]) {
-            camera.rotate(0, 0.1f);
-        }
-        if (Input.keys[GLFW_KEY_E]) {
-            camera.rotate(0, -0.1f);
-        }
-        if (Input.keys[GLFW_KEY_R]) {
-            camera.rotate(0.1f, 0);
-        }
-        if (Input.keys[GLFW_KEY_F]) {
-            camera.rotate(0, -0.1f);
-        }
-
-        camera.update();
-    }
-
-    private void prepareCamera() {
-        Matrix4f pr_matrix = camera.getPRMatrix();
-
-        Shader.TERRAIN_SHADER.enable();
-        Shader.TERRAIN_SHADER.setUniformMat4f("pr_matrix", pr_matrix);
-        Shader.TERRAIN_SHADER.disable();
+        game.update(dT);
     }
 
     private void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        prepareCamera();
-
-//        tetrahedron.render();
-        terrainBlock.render();
+        game.render();
 
         int err = glGetError();
         if (err != GL_NO_ERROR)

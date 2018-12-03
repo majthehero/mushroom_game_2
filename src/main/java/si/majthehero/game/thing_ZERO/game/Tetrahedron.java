@@ -1,4 +1,4 @@
-package si.majthehero.game.thing_ZERO;
+package si.majthehero.game.thing_ZERO.game;
 
 import si.majthehero.game.thing_ZERO.graphics.Geometry;
 import si.majthehero.game.thing_ZERO.graphics.Shader;

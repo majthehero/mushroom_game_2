@@ -6,27 +6,24 @@ import org.joml.Vector3f;
 
 public class Camera {
 
-    float eye_x;
-    float eye_y;
-    float eye_z;
+    private float eye_x;
+    private float eye_y;
+    private float eye_z;
 
-    float tgt_x;
-    float tgt_y;
-    float tgt_z;
+    private float tgt_x;
+    private float tgt_y;
+    private float tgt_z;
 
-    float rot_up;
-    float rot_left;
+    private Matrix4f pr_matrix;
 
-    Matrix4f pr_matrix;
-
-    double dT;
+    private double dT;
 
     public Camera() {
         eye_x = -3;
         eye_y = -2;
         eye_z = 12;
-        rot_up = 0;
-        rot_left = 0;
+        float rot_up = 0;
+        float rot_left = 0;
         tgt_x = 7;
         tgt_y = 7;
         tgt_z = 0;
@@ -59,13 +56,7 @@ public class Camera {
     }
 
     public void update() {
-        System.out.println("Camera at: " +
-                eye_x + " " + eye_y + " " + eye_z);
-        System.out.println("Looking at: " +
-                tgt_x + " " + tgt_y + " " + tgt_z);
-        pr_matrix = new Matrix4f();
-
-        pr_matrix
+        pr_matrix = new Matrix4f()
             .perspective(
                 (float)Math.toRadians(45d),
                 16.0f/10.0f, 0.1f, 100.0f)
@@ -81,6 +72,5 @@ public class Camera {
     public void setDeltaTime(double dT) {
         if (dT < 0.01) dT = 0.01;
         this.dT = dT;
-
     }
 }

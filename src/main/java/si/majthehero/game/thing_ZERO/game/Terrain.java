@@ -2,13 +2,32 @@ package si.majthehero.game.thing_ZERO.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Terrain {
 
-    List<TerrainBlock> terrainBlocks;
+    private List<TerrainBlock> terrainBlocks;
 
+    Terrain() {
+        terrainBlocks = new ArrayList<TerrainBlock>();
+        for (int i=-1; i<=1; i++) {
+            for (int j=-1; j<=1; j++) {
+                terrainBlocks.add(generateBlock(i,j));
+            }
+        }
+    }
 
-    TerrainBlock generateBlock(int block_x, int block_y) {
+    // render
+
+    public void render() {
+        for (TerrainBlock tb : terrainBlocks) {
+            tb.render();
+        }
+    }
+
+    // generating
+
+    private TerrainBlock generateBlock(int block_x, int block_y) {
         class _border {
             float[] h_vals;
             String dir;
@@ -21,8 +40,14 @@ public class Terrain {
         // get neighbours that exist
         List<_border> borders = new ArrayList<>();
         for (TerrainBlock tb : terrainBlocks) {
-            if (Math.abs(tb.pos_x - block_x) == 1 || Math.abs(tb.pos_y - block_y) == 1) {
-
+            int diff_x = Math.abs(tb.pos_x - (block_x * (TerrainBlock.resolution - 3))
+                    - TerrainBlock.resolution/2);
+            int diff_y = Math.abs(tb.pos_y - (block_y * (TerrainBlock.resolution - 2))
+                    - TerrainBlock.resolution/2);
+            System.out.println("Difference to block is: " + diff_x + " " + diff_y);
+            if ((13 < diff_x && diff_x < 17) ||
+                (13 < diff_y && diff_y < 17)) {
+                System.out.println("Getting border.");
                 String direction = "";
                 int dx = tb.pos_x - block_x;
                 int dy = tb.pos_y - block_y;
@@ -62,7 +87,9 @@ public class Terrain {
         }
 
         // create a new block from height map
-        TerrainBlock newBlock = new TerrainBlock(heightmap, block_x, block_y);
+        TerrainBlock newBlock = new TerrainBlock(heightmap,
+                block_x * (TerrainBlock.resolution-3),
+                block_y * (TerrainBlock.resolution-2));
 
         return newBlock;
     }

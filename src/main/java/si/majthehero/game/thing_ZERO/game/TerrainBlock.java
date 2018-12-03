@@ -1,42 +1,73 @@
 package si.majthehero.game.thing_ZERO.game;
 
+import org.joml.Matrix4f;
 import si.majthehero.game.thing_ZERO.graphics.Geometry;
 import si.majthehero.game.thing_ZERO.graphics.Shader;
 import si.majthehero.game.thing_ZERO.graphics.Texture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TerrainBlock {
+
+    List<Mushroom> mushrooms;
 
     int pos_x, pos_y;
     final int seed;
 
     Geometry geometry;
-    Texture texture;
-    Shader shader;
+    static Texture texture;
 
     public static int resolution = 4*4+1;
     private float SCALING_FACTOR = 0.5f;
     private float[][] heightmap;
 
+    {
+        texture = new Texture("assets/textures/grass.jpg");
+    }
+
     public TerrainBlock(float[][] heightmap, int pos_x, int pos_y) {
         this.pos_x = pos_x - resolution/2;
         this.pos_y = pos_y - resolution/2;
-        this.heightmap = heightmap;
+        this.heightmap = mirror(heightmap);
         diamond_square(0, resolution-1, 0, resolution-1, 0);
         seed = (pos_x + resolution * pos_y) & (pos_y + resolution * pos_x);
         System.out.println("Seed for TerrainBlock@" + pos_x + ":" + pos_y + " is " + seed);
 
         createGeometry();
-        texture = new Texture("assets/textures/grass.jpg");
+
+        int mushroom_num = (int) (Math.random() * 20);
+        mushrooms = new ArrayList<>(mushroom_num);
+        for (int i=0; i<mushroom_num; i++) {
+            mushrooms.add(new Mushroom());
+        }
     }
 
+    private float[][] mirror(float[][] hmap) {
+        float[][] retval = new float[hmap.length][hmap[0].length];
+        for (int i = 0; i < hmap.length; i++) {
+            for (int j = 0; j < hmap[0].length; j++) {
+                retval[hmap.length-i-1][hmap.length-j-1] = hmap[i][j];
+            }
+        }
+        return retval;
+    }
 
     // rendering ======================================================================
     public void render() {
+        Matrix4f mvMatrix = new Matrix4f()
+                .translate(pos_x, pos_y, 0);
+
         Shader.TERRAIN_SHADER.enable();
+        Shader.TERRAIN_SHADER.setUniformMat4f("mv_matrix", mvMatrix);
         texture.bind();
         geometry.render();
         texture.unbind();
         Shader.TERRAIN_SHADER.disable();
+
+        for (Mushroom m : mushrooms) {
+            m.render(mvMatrix);
+        }
     }
 
     // generating terrain =============================================================
